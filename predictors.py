@@ -1,4 +1,5 @@
 from math import sqrt
+from exceptions import OutOfSampleError
 
 
 class Predictor:
@@ -7,10 +8,31 @@ class Predictor:
         """
         Store historical DataTable.
         """
-        # Enforce abstract behavior without importing abc.
         if type(self).predict is Predictor.predict:
             raise TypeError("Predictor subclasses must implement predict().")
         self.historical_data = historical_data
+
+    def _prepare_patient(self, patient):
+        """
+        Fill missing features and check historical feature ranges.
+        """
+        patient = patient.copy()
+        for feature_number in range(1, 10):
+            feature_name = f"Feature{feature_number}"
+            if patient[feature_name] == "?":
+                patient[feature_name] = self.historical_data.get_column_average(
+                    feature_name
+                )
+            else:
+                patient[feature_name] = float(patient[feature_name])
+
+            minimum = self.historical_data.get_column_min(feature_name)
+            maximum = self.historical_data.get_column_max(feature_name)
+            if patient[feature_name] < minimum or patient[feature_name] > maximum:
+                raise OutOfSampleError(
+                    feature_name, patient[feature_name], minimum, maximum
+                )
+        return patient
 
     def predict(self, patient):
         """
@@ -38,6 +60,7 @@ class MajorityClassPredictor(Predictor):
         """
         Always return the most common historical TumorType.
         """
+        self._prepare_patient(patient)
         return self.majority_class
 
 
@@ -63,6 +86,7 @@ class NearestNeighborPredictor(Predictor):
         """
         Find closest historical patient and return its TumorType.
         """
+        patient = self._prepare_patient(patient)
         closest_patient = self.historical_data.data[0]
         smallest_distance = self.distance(patient, closest_patient)
 
