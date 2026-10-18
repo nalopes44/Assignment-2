@@ -1,5 +1,5 @@
 from data_representation import DataTable
-from predictors import MajorityClassPredictor, NearestNeighborPredictor
+from predictors import ModePredictor, NearestNeighborPredictor
 from exceptions import OutOfSampleError
 
 
@@ -31,7 +31,7 @@ def main():
 
 
     # Create predictors
-    mode_predictor = MajorityClassPredictor(historical)
+    mode_predictor = ModePredictor(historical)
     nn_predictor = NearestNeighborPredictor(historical)
 
 

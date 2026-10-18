@@ -41,8 +41,8 @@ class Predictor:
         raise NotImplementedError("Subclasses must implement predict().")
 
 
-class MajorityClassPredictor(Predictor):
-
+class ModePredictor(Predictor):
+    
     def __init__(self, historical_data):
         super().__init__(historical_data)
         tumor_types = historical_data.get_column("TumorType")
