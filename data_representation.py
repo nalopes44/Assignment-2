@@ -24,10 +24,12 @@ class DataTable:
 
         # New cases use the matching historical file in the same directory.
         historical_rows = self.data
-        directory, separator, filename = str(csv_path).rpartition("/")
+        from pathlib import Path
+        csv_file_path = Path(csv_path)
+        filename = csv_file_path.name
         if missing_columns and filename.startswith("cancer_new_cases"):
-            historical_path = directory + separator + filename.replace(
-                "cancer_new_cases", "cancer_historical", 1
+            historical_path = csv_file_path.with_name(
+                filename.replace("cancer_new_cases", "cancer_historical", 1)
             )
             with open(historical_path, newline="", encoding="utf-8-sig") as csv_file:
                 historical_columns = [
